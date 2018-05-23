@@ -31,7 +31,7 @@ module.exports = {
       return templateVersion
     },
   },
-  
+
   prompts: {
     name: {
       when: 'isNotTest',
@@ -50,6 +50,16 @@ module.exports = {
       when: 'isNotTest',
       type: 'string',
       message: 'Author',
+    },
+    mobile: {
+      when: 'isNotTest',
+      type: 'confirm',
+      message: 'Is it a mobile project?'
+    },
+    locale: {
+      when: 'isNotTest',
+      type: 'confirm',
+      message: 'Is it a multi-language project?'
     },
     build: {
       when: 'isNotTest',
@@ -73,6 +83,16 @@ module.exports = {
       when: 'isNotTest',
       type: 'confirm',
       message: 'Install vue-router?',
+    },
+    store: {
+      when: 'isNotTest',
+      type: 'confirm',
+      message: 'Install vuex?'
+    },
+    prerender: {
+      when: 'isNotTest',
+      type: 'confirm',
+      message: 'Use prerender?'
     },
     lint: {
       when: 'isNotTest',
@@ -170,6 +190,12 @@ module.exports = {
     'test/unit/setup.js': "unit && runner === 'jest'",
     'test/e2e/**/*': 'e2e',
     'src/router/**/*': 'router',
+    'src/store/**/*': 'store',
+    'src/locale/**/*': 'locale',
+    'build/prerender.js': 'prerender',
+    'build/prerender.routes.js': 'prerender',
+    'build/webpack.prerender.conf.js': 'prerender',
+    'config/prerender.env.js': 'prerender'
   },
   complete: function(data, { chalk }) {
     const green = chalk.green

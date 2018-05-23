@@ -1,34 +1,33 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    {{#router}}
-    <router-view/>
-    {{else}}
-    <HelloWorld/>
-    {{/router}}
-  </div>
+    <div class="app"{{#locale}} :class="{ 'en-wrapper': $lang === 'en'}"{{/locale}}>
+        {{#router}}
+        <router-view></router-view>
+        {{/router}}
+    </div>
 </template>
 
 <script>
-{{#unless router}}
-import HelloWorld from './components/HelloWorld'
-
-{{/unless}}
+{{#locale}}
+import Vue from 'vue';
+{{/locale}}
 export default {
-  name: 'App'{{#router}}{{else}},
-  components: {
-    HelloWorld
-  }{{/router}}
-}
+    {{#locale}}
+    created() {
+        if (window.language === 'en') {
+            Vue.config.lang = 'en';
+        } else {
+            Vue.config.lang = 'zh';
+        }
+    }
+    {{/locale}}
+};
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss">
+.app {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 </style>

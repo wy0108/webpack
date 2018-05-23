@@ -10,10 +10,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 const env = {{#if_or unit e2e}}process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
-  : {{/if_or}}require('../config/prod.env')
+  : {{/if_or}}require('../config/prerender.env')
 
 const webpackConfig = merge(baseWebpackConfig, {
   externals: {
@@ -34,14 +36,15 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   module: {
     rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
+      sourceMap: config.prerender.productionSourceMap,
       extract: true,
       usePostCSS: true
     })
   },
-  devtool: config.build.productionSourceMap ? config.build.devtool : false,
+  devtool: config.prerender.productionSourceMap ? config.prerender.devtool : false,
   output: {
-    path: config.build.assetsRoot,
+    path: config.prerender.assetsRoot,
+    publicPath: config.prerender.assetsPublicPath,
     filename: utils.assetsPath('js/[name].js'),
     chunkFilename: utils.assetsPath('js/[id].js')
   },
@@ -56,7 +59,7 @@ const webpackConfig = merge(baseWebpackConfig, {
           warnings: false
         }
       },
-      sourceMap: config.build.productionSourceMap,
+      sourceMap: config.prerender.productionSourceMap,
       parallel: true
     }),
     // extract css into its own file
@@ -71,7 +74,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
     new OptimizeCSSPlugin({
-      cssProcessorOptions: config.build.productionSourceMap
+      cssProcessorOptions: config.prerender.productionSourceMap
         ? { safe: true, map: { inline: false } }
         : { safe: true }
     }),
@@ -81,7 +84,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: {{#if_or unit e2e}}process.env.NODE_ENV === 'testing'
         ? 'index.html'
-        : {{/if_or}}config.build.index,
+        : {{/if_or}}config.prerender.index,
       template: 'production.html',
       inject: true,
       minify: {
@@ -132,14 +135,27 @@ const webpackConfig = merge(baseWebpackConfig, {
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
+        to: config.prerender.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
+    // 预渲染
+    new PrerenderSPAPlugin({
+      staticDir: config.prerender.assetsRoot,
+      outputDir: config.prerender.assetsRoot,
+      routes: config.prerender.routes,
+      renderer: new Renderer({
+        renderAfterTime: 5000
+      }),
+      server : {
+        proxy: config.prerender.proxyTable
+      }
+    })
   ]
 })
 
-if (config.build.productionGzip) {
+if (config.prerender.productionGzip) {
   const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
   webpackConfig.plugins.push(
@@ -148,7 +164,7 @@ if (config.build.productionGzip) {
       algorithm: 'gzip',
       test: new RegExp(
         '\\.(' +
-        config.build.productionGzipExtensions.join('|') +
+        config.prerender.productionGzipExtensions.join('|') +
         ')$'
       ),
       threshold: 10240,
@@ -157,7 +173,7 @@ if (config.build.productionGzip) {
   )
 }
 
-if (config.build.bundleAnalyzerReport) {
+if (config.prerender.bundleAnalyzerReport) {
   const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
   webpackConfig.plugins.push(new BundleAnalyzerPlugin())
 }

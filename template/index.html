@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>{{ name }}</title>
-  </head>
-  <body>
+    <link href="https://cdn.bootcss.com/normalize/7.0.0/normalize.min.css" rel="stylesheet">
+    {{#mobile}}
+    <script src="http://asset.dmcdn.com/public/tbcdn-flexible/0.3.2/flexible.js"></script>
+    {{/mobile}}
+</head>
+
+<body>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-  </body>
+</body>
+
 </html>
